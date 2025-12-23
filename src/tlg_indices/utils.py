@@ -2,7 +2,8 @@
 
 from typing import Optional, Union
 from tlg_indices.author_id_to_author_name import AUTHOR_ID_TO_AUTHOR_NAME
-from tlg_indices.data_types import AuthorID
+from tlg_indices.author_ids_to_works import AUTHOR_ID_TO_WORKS
+from tlg_indices.data_types import AuthorID, WorkID
 from tlg_indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
 from tlg_indices.female_author_ids import FEMINAE
 from tlg_indices.geography_to_author_id import GEO_TO_AUTHOR_ID
@@ -109,3 +110,23 @@ def get_author_name_from_author_id(author_id: Union[AuthorID, str]) -> Optional[
 def get_author_id_from_author_name(name: str) -> Optional[AuthorID]:
     """Pass author name and return a string with the author id"""
     return _AUTHOR_NAME_INDEX_CASEFOLD.get(name.casefold())
+
+
+def get_author_works_index() -> dict[AuthorID, dict[WorkID, str]]:
+    """Returns entirety of id-author TLG index."""
+    return AUTHOR_ID_TO_WORKS
+
+
+def get_works_by_author_id(author_id: Union[AuthorID, str]) -> dict[WorkID, str]:
+    """Pass author id and return a dictionary of its works."""
+    return AUTHOR_ID_TO_WORKS[AuthorID(author_id)]
+
+
+def get_work_name(
+    author_id: Union[AuthorID, str], work_id: Union[WorkID, str]
+) -> Optional[str]:
+    """Pass author id and work id and return the work name."""
+    works = AUTHOR_ID_TO_WORKS.get(AuthorID(author_id))
+    if works is None:
+        return None
+    return works.get(WorkID(work_id))

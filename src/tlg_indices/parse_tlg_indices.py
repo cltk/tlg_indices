@@ -25,11 +25,6 @@ def open_json(_file):
         return json.load(f)
 
 
-def get_works_by_id(_id):
-    """Pass author id and return a dictionary of its works."""
-    return WORK_NUMBERS[_id]
-
-
 def get_date_author() -> dict[str, list[str]]:
     """Returns entirety of date-author index."""
     return MAP_DATE_TO_AUTHORS
