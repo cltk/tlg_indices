@@ -32,6 +32,11 @@ _AUTHOR_ID_TO_GEO: dict[AuthorID, str] = {
 _AUTHOR_NAME_INDEX_CASEFOLD: dict[str, AuthorID] = {
     name.casefold(): author_id for author_id, name in AUTHOR_ID_TO_AUTHOR_NAME.items()
 }
+_AUTHOR_ID_TO_DATE: dict[AuthorID, str] = {
+    author_id: date
+    for date, author_ids in MAP_DATE_TO_AUTHORS.items()
+    for author_id in author_ids
+}
 
 
 def get_indices() -> dict[str, dict[str, str]]:
@@ -105,7 +110,7 @@ def author_id_to_author_name() -> dict[AuthorID, str]:
 
 def get_author_name_from_author_id(author_id: Union[AuthorID, str]) -> Optional[str]:
     """Pass author id and return a string with the author label"""
-    return AUTHOR_ID_TO_AUTHOR_NAME.get(AuthorID(author_id), None)
+    return AUTHOR_ID_TO_AUTHOR_NAME.get(AuthorID(author_id))
 
 
 def get_author_id_from_author_name(name: str) -> Optional[AuthorID]:
@@ -143,10 +148,6 @@ def get_dates() -> list[str]:
     return sorted(MAP_DATE_TO_AUTHORS.keys())
 
 
-def get_date_of_author(_id):
+def get_date_of_author(author_id: Union[AuthorID, str]) -> Optional[str]:
     """Pass author id and return the name of its associated date."""
-    map_date_to_authors: dict[str, list[str]] = get_date_author()
-    for date, ids in map_date_to_authors.items():
-        if _id in ids:
-            return date
-    return None
+    return _AUTHOR_ID_TO_DATE.get(AuthorID(author_id))

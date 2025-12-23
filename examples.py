@@ -8,6 +8,8 @@ from tlg_indices.utils import (
     get_author_name_from_author_id,
     get_author_works_index,
     get_date_author,
+    get_date_of_author,
+    get_dates,
     get_work_name,
     get_epithet_of_author,
     get_female_authors,
@@ -81,6 +83,11 @@ def main() -> None:
 
     dates: list[str] = get_dates()
     print("Dates:", dates)
+
+    some_author_id: str = "0007"
+    date: Optional[str] = get_date_of_author(author_id=some_author_id)
+    print(f"Date of author '{some_author_id}':", date)
+
 
 if __name__ == "__main__":
     main()

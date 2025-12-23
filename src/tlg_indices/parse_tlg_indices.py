@@ -8,7 +8,6 @@ import re
 from re import Pattern
 
 
-
 __author__ = [
     "Kyle P. Johnson <kyle@kyle-p-johnson.com>",
     "Stephen Margheim <stephen.margheim@gmail.com>",
