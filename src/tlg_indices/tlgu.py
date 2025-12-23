@@ -89,7 +89,12 @@ def tlgu_convert_file(
     else:
         raise ValueError(f"Invalid corpus '{corpus}'.")
     print("Going to call tlgu with:", tlgu_call)
-    subprocess.call(tlgu_call, shell=True)
+    try:
+        subprocess.run(tlgu_call, shell=True, check=True)
+    except subprocess.CalledProcessError as exc:
+        raise RuntimeError(
+            f"tlgu failed with exit code {exc.returncode}. The likely cause is that `tlgu` is not installed. To install, follow instructions at <https://github.com/cltk/grc_software_tlgu>."
+        ) from exc
     if grouping == "author":
         if not target_path.exists():
             raise FileNotFoundError(f"Failed to create file: {target_path}")
@@ -390,41 +395,3 @@ class TLGU:
     #         except Exception as err:
     #             # logger.error("Failed to convert files: %s.", err)
     # return None
-
-
-if __name__ == "__main__":
-    # Convert a single file into author file
-    tlgu_convert_file(
-        orig_txt_path="/Users/kylepjohnson/tlg/TLG_E/TLG0007.TXT",
-        target_txt_path="/Users/kylepjohnson/Downloads/0007.txt",
-        corpus="tlg",
-        grouping="author",
-        overwrite=True,
-    )
-
-    # Convert a single file into works files
-    tlgu_convert_file(
-        orig_txt_path="/Users/kylepjohnson/tlg/TLG_E/TLG0007.TXT",
-        target_txt_path="/Users/kylepjohnson/Downloads/0007",
-        corpus="tlg",
-        grouping="work",
-        overwrite=True,
-    )
-
-    # Convert entire corpus into author files
-    tlgu_convert_corpus(
-        orig_txt_dir="/Users/kylepjohnson/tlg/TLG_E",
-        target_txt_dir="/Users/kylepjohnson/Downloads/tlg-authors",
-        corpus="tlg",
-        grouping="author",
-        overwrite=True,
-    )
-
-    # Convert entire corpus into work files
-    tlgu_convert_corpus(
-        orig_txt_dir="/Users/kylepjohnson/tlg/TLG_E",
-        target_txt_dir="/Users/kylepjohnson/Downloads/tlg-works",
-        corpus="tlg",
-        grouping="work",
-        overwrite=True,
-    )

@@ -16,14 +16,24 @@ This repository makes no claim to ownership of the contents of the original TLG 
 
 # Usage overview
 
-The main entry point is the utility functions in `src/tlg_indices/utils.py`, which expose prebuilt indices and convenience lookups. The quickest way to see how to call these helpers is in `examples.py`, which demonstrates:
+The main entry point is the utility functions in `src/tlg_indices/utils.py`, which expose prebuilt indices and convenience lookups. The quickest way to see how to call these helpers is in `tlg_index_examples.py`, which demonstrates:
 
 - Reading index data (epithets, geographies, dates, and author/work mappings).
 - Looking up authors by epithet or geography, and reversing those lookups.
 - Looking up works by author and retrieving a single work title.
 - Sorting and querying date ranges using `ParsedDate` and `get_dates_in_range()`.
 
-For a runnable walkthrough, open `examples.py` and follow the patterns there.
+For a runnable walkthrough, open `tlg_index_examples.py` and follow the patterns there.
+
+# Converting Beta Code with `tlgu`
+
+If you have Beta Code files from the original TLG/PHI distributions, you can convert them using the `tlgu` wrapper in this package. See `tlgu_examples.py` for runnable examples of:
+
+- Converting a single file into an author-level file (`grouping="author"`).
+- Splitting a single file into work-level files (`grouping="work"`).
+- Converting an entire corpus for either grouping.
+
+Open `tlgu_examples.py` and adjust the file paths for your local setup.
 
 # Packaging
 
