@@ -1,4 +1,5 @@
 """Indices for the TLG author ids to author names."""
+
 from typing import Union
 
 TLG_INDEX: dict[str, str] = {

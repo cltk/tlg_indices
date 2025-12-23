@@ -2,18 +2,17 @@
 
 import json
 import os
-from typing import Optional
+from typing import NewType, Optional
 
 import re
 from re import Pattern
 
-from .author_date import MAP_DATE_TO_AUTHORS
-from .author_epithet import MAP_EPITHET_TO_AUTHOR_IDS
-from .author_female import AUTHOR_FEMALE
-from .author_geo import AUTHOR_GEO
-from .id_author import ID_AUTHOR
-from .index_lists import ALL_TLG_INDICES
-from .work_numbers import WORK_NUMBERS
+from .date_to_author_id import MAP_DATE_TO_AUTHORS
+from .epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
+from .geography_to_author_id import AUTHOR_GEO
+from .author_id_to_author_name import ID_AUTHOR
+from .tlg_indices import ALL_TLG_INDICES
+from .author_ids_to_work_ids_and_work_names import WORK_NUMBERS
 
 __author__ = [
     "Kyle P. Johnson <kyle@kyle-p-johnson.com>",
@@ -22,43 +21,6 @@ __author__ = [
 ]
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-def get_female_authors() -> set[str]:
-    """Open female authors index and return ordered
-    set of author ids."""
-    return set(AUTHOR_FEMALE["Femina"])
-
-
-def get_epithet_index() -> dict[str, set[str]]:
-    """Return dict of epithets (key) to a set of all
-    author ids of that epithet (value).
-    """
-    _dict: dict[str, set[str]] = dict()
-    for key, val in MAP_EPITHET_TO_AUTHOR_IDS.items():
-        _dict[key] = set(val)
-    return _dict
-
-
-def get_epithets() -> list[str]:
-    """Return a list of all the epithet labels."""
-    return sorted(MAP_EPITHET_TO_AUTHOR_IDS.keys())
-
-
-def select_authors_by_epithet(query: str) -> set[str]:
-    """Pass exact name (case-insensitive) of
-    epithet name, return ordered set of author ids.
-    """
-    for epithet, ids in MAP_EPITHET_TO_AUTHOR_IDS.items():
-        if epithet.casefold() == query.casefold():
-            return set(ids)
-
-
-def get_epithet_of_author(_id: str) -> str:
-    """Pass author id and return the name of its associated epithet."""
-    for epithet, ids in MAP_EPITHET_TO_AUTHOR_IDS.items():
-        if _id in ids:
-            return epithet
 
 
 def get_geo_index() -> dict[str, set[str]]:
@@ -105,9 +67,7 @@ def get_id_author() -> dict[str, str]:
 def select_id_by_name(query) -> list[tuple[str, str]]:
     """Do a case-insensitive regex match on author name, returns TLG id."""
     id_author: dict[str, str] = get_id_author()
-    comp: Pattern[str] = re.compile(
-        r"{}".format(query.casefold())
-    )
+    comp: Pattern[str] = re.compile(r"{}".format(query.casefold()))
     matches: list[tuple[str, str]] = list()
     for _id, author in id_author.items():
         match: list[str] = comp.findall(author.casefold())

@@ -8,7 +8,7 @@ from typing import Union
 import re
 from re import Pattern
 
-from .tlg_index import TLG_INDEX, TLG_WORKS_INDEX
+from .author_id_to_name import TLG_INDEX, TLG_WORKS_INDEX
 
 
 def tlg_plaintext_cleanup(
