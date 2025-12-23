@@ -1,10 +1,13 @@
 """Read and return data from the author index files."""
 
 from typing import Optional, Union
+from tlg_indices.author_id_to_author_name import AUTHOR_ID_TO_AUTHOR_NAME
 from tlg_indices.data_types import AuthorID
 from tlg_indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
 from tlg_indices.female_author_ids import FEMINAE
 from tlg_indices.geography_to_author_id import GEO_TO_AUTHOR_ID
+from tlg_indices.tlg_indices import ALL_TLG_INDICES
+# from tlg_indices.author_ids_to_work_ids_and_work_names import WORK_NUMBERS
 
 # Allows an O(1) lookup
 _EPITHET_INDEX_CASEFOLD: dict[str, list[AuthorID]] = {
@@ -24,6 +27,14 @@ _AUTHOR_ID_TO_GEO: dict[AuthorID, str] = {
     for geo, author_ids in GEO_TO_AUTHOR_ID.items()
     for author_id in author_ids
 }
+_AUTHOR_NAME_INDEX_CASEFOLD: dict[str, AuthorID] = {
+    name.casefold(): author_id for author_id, name in AUTHOR_ID_TO_AUTHOR_NAME.items()
+}
+
+
+def get_indices() -> dict[str, dict[str, str]]:
+    """Return all of the TLG's indices."""
+    return ALL_TLG_INDICES
 
 
 def get_female_authors() -> list[str]:
@@ -83,3 +94,18 @@ def get_authors_by_geo(geo: str) -> list[AuthorID]:
 def get_geo_of_author(author_id: Union[AuthorID, str]) -> Optional[str]:
     """Pass author id and return the name of its associated geography."""
     return _AUTHOR_ID_TO_GEO.get(AuthorID(author_id))
+
+
+def author_id_to_author_name() -> dict[AuthorID, str]:
+    """Returns entirety of id-author TLG index."""
+    return AUTHOR_ID_TO_AUTHOR_NAME
+
+
+def get_author_name_from_author_id(author_id: Union[AuthorID, str]) -> Optional[str]:
+    """Pass author id and return a string with the author label"""
+    return AUTHOR_ID_TO_AUTHOR_NAME.get(AuthorID(author_id), None)
+
+
+def get_author_id_from_author_name(name: str) -> Optional[AuthorID]:
+    """Pass author name and return a string with the author id"""
+    return _AUTHOR_NAME_INDEX_CASEFOLD.get(name.casefold())

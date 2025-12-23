@@ -8,11 +8,7 @@ import re
 from re import Pattern
 
 from .date_to_author_id import MAP_DATE_TO_AUTHORS
-from .epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
-from .geography_to_author_id import GEO_TO_AUTHOR_ID
-from .author_id_to_author_name import ID_AUTHOR
-from .tlg_indices import ALL_TLG_INDICES
-from .author_ids_to_work_ids_and_work_names import WORK_NUMBERS
+
 
 __author__ = [
     "Kyle P. Johnson <kyle@kyle-p-johnson.com>",
@@ -21,28 +17,6 @@ __author__ = [
 ]
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-def get_lists() -> dict[str, dict[str, str]]:
-    """Return all of the TLG's indices."""
-    return ALL_TLG_INDICES
-
-
-def get_id_author() -> dict[str, str]:
-    """Returns entirety of id-author TLG index."""
-    return ID_AUTHOR
-
-
-def select_id_by_name(query) -> list[tuple[str, str]]:
-    """Do a case-insensitive regex match on author name, returns TLG id."""
-    id_author: dict[str, str] = get_id_author()
-    comp: Pattern[str] = re.compile(r"{}".format(query.casefold()))
-    matches: list[tuple[str, str]] = list()
-    for _id, author in id_author.items():
-        match: list[str] = comp.findall(author.casefold())
-        if match:
-            matches.append((_id, author))
-    return matches
 
 
 def open_json(_file):
@@ -54,11 +28,6 @@ def open_json(_file):
 def get_works_by_id(_id):
     """Pass author id and return a dictionary of its works."""
     return WORK_NUMBERS[_id]
-
-
-def check_id(_id):
-    """Pass author id and return a string with the author label"""
-    return ID_AUTHOR[_id]
 
 
 def get_date_author() -> dict[str, list[str]]:
