@@ -10,6 +10,7 @@ from tlg_indices.utils import (
     get_date_author,
     get_date_of_author,
     get_dates,
+    get_date_sort_key,
     get_work_name,
     get_epithet_of_author,
     get_female_authors,
@@ -87,6 +88,9 @@ def main() -> None:
     some_author_id: str = "0007"
     date: Optional[str] = get_date_of_author(author_id=some_author_id)
     print(f"Date of author '{some_author_id}':", date)
+
+    sorted_dates = sorted(dates, key=get_date_sort_key)
+    print("Sorted dates:", sorted_dates)
 
 
 if __name__ == "__main__":

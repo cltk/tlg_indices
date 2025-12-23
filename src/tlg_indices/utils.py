@@ -1,5 +1,7 @@
 """Read and return data from the author index files."""
 
+from dataclasses import dataclass
+import re
 from typing import Optional, Union
 from tlg_indices.author_id_to_author_name import AUTHOR_ID_TO_AUTHOR_NAME
 from tlg_indices.author_ids_to_works import AUTHOR_ID_TO_WORKS
@@ -31,11 +33,6 @@ _AUTHOR_ID_TO_GEO: dict[AuthorID, str] = {
 }
 _AUTHOR_NAME_INDEX_CASEFOLD: dict[str, AuthorID] = {
     name.casefold(): author_id for author_id, name in AUTHOR_ID_TO_AUTHOR_NAME.items()
-}
-_AUTHOR_ID_TO_DATE: dict[AuthorID, str] = {
-    author_id: date
-    for date, author_ids in MAP_DATE_TO_AUTHORS.items()
-    for author_id in author_ids
 }
 
 
@@ -138,6 +135,9 @@ def get_work_name(
     return works.get(WorkID(work_id))
 
 
+# Dates
+
+
 def get_date_author() -> dict[str, list[AuthorID]]:
     """Returns entirety of date-author index."""
     return MAP_DATE_TO_AUTHORS
@@ -151,3 +151,125 @@ def get_dates() -> list[str]:
 def get_date_of_author(author_id: Union[AuthorID, str]) -> Optional[str]:
     """Pass author id and return the name of its associated date."""
     return _AUTHOR_ID_TO_DATE.get(AuthorID(author_id))
+
+
+_AUTHOR_ID_TO_DATE: dict[AuthorID, str] = {
+    author_id: date
+    for date, author_ids in MAP_DATE_TO_AUTHORS.items()
+    for author_id in author_ids
+}
+_DATE_SORT_SENTINEL = 10**9
+_SPECIAL_DATE_SORT_KEYS: dict[str, tuple[int, int, int, int, str]] = {
+    "Incertum": (_DATE_SORT_SENTINEL, _DATE_SORT_SENTINEL, 9, 0, "Incertum"),
+    "Varia": (_DATE_SORT_SENTINEL, _DATE_SORT_SENTINEL, 9, 1, "Varia"),
+}
+_QUALIFIER_RE = re.compile(r"^\s*([ap])\.\s*", re.IGNORECASE)
+_ERA_RE = re.compile(r"(A\.D\.|B\.C\.)", re.IGNORECASE)
+_YEAR_RE = re.compile(r"(\d+)")
+
+
+@dataclass(frozen=True)
+class ParsedDate:
+    raw: str
+    start_year: Optional[int]
+    end_year: Optional[int]
+    start_qualifier: Optional[str]
+    end_qualifier: Optional[str]
+    uncertain: bool
+    special: Optional[str]
+
+    def sort_key(self) -> tuple[int, int, int, int, str]:
+        """Return a sort key that handles ranges and qualifiers."""
+        return get_date_sort_key(self)
+
+
+def _parse_date_part(
+    part: str, default_era: Optional[str]
+) -> tuple[Optional[int], Optional[str], Optional[str]]:
+    part = part.strip()
+    qualifier = None
+    qualifier_match = _QUALIFIER_RE.match(part)
+    if qualifier_match:
+        qualifier = qualifier_match.group(1).lower()
+        part = part[qualifier_match.end() :]
+    era_match = _ERA_RE.search(part)
+    era = None
+    if era_match:
+        era_token = era_match.group(1).upper()
+        era = "AD" if era_token.startswith("A") else "BC"
+        part = _ERA_RE.sub("", part)
+    part = part.replace("?", "")
+    year_match = _YEAR_RE.search(part)
+    if not year_match:
+        return None, era or default_era, qualifier
+    year = int(year_match.group(1))
+    era = era or default_era
+    if era is None:
+        return None, None, qualifier
+    if era == "BC":
+        # Use astronomical year numbering: 1 B.C. -> 0, 2 B.C. -> -1.
+        year = 1 - year
+    return year, era, qualifier
+
+
+def _qualifier_rank(parsed: "ParsedDate") -> int:
+    has_a = parsed.start_qualifier == "a" or parsed.end_qualifier == "a"
+    has_p = parsed.start_qualifier == "p" or parsed.end_qualifier == "p"
+    if has_a and not has_p:
+        return -1
+    if has_p and not has_a:
+        return 1
+    return 0
+
+
+def parse_tlg_date(raw: str) -> ParsedDate:
+    """Parse TLG date strings into a structured form."""
+    raw = raw.strip()
+    if raw in _SPECIAL_DATE_SORT_KEYS:
+        return ParsedDate(
+            raw=raw,
+            start_year=None,
+            end_year=None,
+            start_qualifier=None,
+            end_qualifier=None,
+            uncertain=False,
+            special=raw,
+        )
+    uncertain = "?" in raw
+    normalized = raw.replace("/", "-")
+    if "-" in normalized:
+        start_raw, end_raw = normalized.split("-", maxsplit=1)
+    else:
+        start_raw = normalized
+        end_raw = normalized
+    start_year, start_era, start_qualifier = _parse_date_part(start_raw, None)
+    end_year, end_era, end_qualifier = _parse_date_part(end_raw, start_era)
+    if start_era is None and end_era is not None:
+        start_year, start_era, start_qualifier = _parse_date_part(start_raw, end_era)
+    if end_era is None and start_era is not None:
+        end_year, end_era, end_qualifier = _parse_date_part(end_raw, start_era)
+    return ParsedDate(
+        raw=raw,
+        start_year=start_year,
+        end_year=end_year,
+        start_qualifier=start_qualifier,
+        end_qualifier=end_qualifier,
+        uncertain=uncertain,
+        special=None,
+    )
+
+
+def get_date_sort_key(
+    date_value: Union[str, "ParsedDate"],
+) -> tuple[int, int, int, int, str]:
+    """Return a stable sort key for TLG date values."""
+    parsed = parse_tlg_date(date_value) if isinstance(date_value, str) else date_value
+    if parsed.special:
+        return _SPECIAL_DATE_SORT_KEYS[parsed.special]
+    start_year = (
+        parsed.start_year if parsed.start_year is not None else _DATE_SORT_SENTINEL
+    )
+    end_year = parsed.end_year if parsed.end_year is not None else _DATE_SORT_SENTINEL
+    qualifier_rank = _qualifier_rank(parsed)
+    uncertain_rank = 1 if parsed.uncertain else 0
+    return (start_year, end_year, qualifier_rank, uncertain_rank, parsed.raw)
