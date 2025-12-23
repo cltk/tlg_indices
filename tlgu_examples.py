@@ -13,7 +13,7 @@ def main() -> None:
         overwrite=True,
     )
 
-    # # Convert a single TLG file into works files
+    # Convert a single TLG file into works files
     tlgu_convert_file(
         orig_txt_path="/Users/kylepjohnson/tlg/TLG_E/TLG0007.TXT",
         target_txt_path="/Users/kylepjohnson/Downloads/0007",
@@ -22,7 +22,7 @@ def main() -> None:
         overwrite=True,
     )
 
-    # # Convert entire TLG corpus into author files
+    # Convert entire TLG corpus into author files
     tlgu_convert_corpus(
         orig_txt_dir="/Users/kylepjohnson/tlg/TLG_E",
         target_txt_dir="/Users/kylepjohnson/Downloads/tlg-authors",
@@ -31,7 +31,7 @@ def main() -> None:
         overwrite=True,
     )
 
-    # # Convert entire TLG corpus into work files
+    # Convert entire TLG corpus into work files
     tlgu_convert_corpus(
         orig_txt_dir="/Users/kylepjohnson/tlg/TLG_E",
         target_txt_dir="/Users/kylepjohnson/Downloads/tlg-works",

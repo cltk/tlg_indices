@@ -58,8 +58,13 @@ def tlgu_convert_file(
     if not orig_path.exists():
         raise FileNotFoundError(f"File '{orig_path}' does not exist.")
     target_name = target_path.name
+    # Skip index files in TLG
     if target_name.startswith("DOCCAN"):
         print("Skipping 'DOCCAN*' file:", orig_path)
+        return None
+    # Skip these files in PHI5
+    if target_name.startswith("AUTHTAB") or target_name.startswith("CIV") or target_name.startswith("COP") or target_name.startswith("IND"):
+        print("Skipping non-text PHI5 file:", orig_path)
         return None
     if target_name.lower().startswith("tlg"):
         target_name = target_name[3:]
