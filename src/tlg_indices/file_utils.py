@@ -8,45 +8,54 @@ from typing import Union
 import re
 from re import Pattern
 
+from tlg_indices.data_types import AuthorID
+from tlg_indices.utils import get_all_authors_ids
+
 from .author_id_to_name import TLG_INDEX, TLG_WORKS_INDEX
 
 
-def tlg_plaintext_cleanup(
-    text: str, rm_punctuation: bool = False, rm_periods: bool = False
-) -> str:
-    """Remove and substitute post-processing for Greek TLG text.
-    TODO: Surely more junk to pull out. Please submit bugs!
+def assemble_tlg_author_filepaths(corpus_dir: str) -> list[str]:
+    """Reads TLG index and builds a list of absolute filepaths.
+    This expects that files have been translated by `tlgu` and are at
+    a path something like `"grc/text/tlg/plaintext/"`
     """
-    # Note: flag was removed, is necessary?
-    remove_comp: Pattern[str] = re.compile(
-        r"-\n|[«»<>〈〉\(\)‘’_—:!\?\'\"\*]|{[[:print:][:space:]]+?}|\[[[:print:][:space:]]+?\]|[a-zA-Z0-9]",
-    )
-    text = remove_comp.sub("", text)
-
-    if rm_punctuation:
-        punct_comp: Pattern[str] = re.compile(r",|·")
-        text = punct_comp.sub("", text)
-
-    if rm_periods:
-        period_comp: Pattern[str] = re.compile(r"\.|;")
-        text = period_comp.sub("", text)
-
-    # replace line breaks w/ space
-    replace_comp: Pattern[str] = re.compile(r"\n")
-    text = replace_comp.sub(" ", text)
-
-    comp_space: Pattern[str] = re.compile(r"\s+")
-    text = comp_space.sub(" ", text)
-
-    return text
+    corpus_dir = os.path.expanduser(corpus_dir)
+    if not os.path.exists(corpus_dir):
+        raise FileNotFoundError(f"Directory {corpus_dir} does not exist.")
+    all_author_ids: list[AuthorID] = get_all_authors_ids()
+    filepaths: list[str] = [
+        os.path.join(corpus_dir, x + ".TXT") for x in all_author_ids
+    ]
+    return filepaths
 
 
-# TODO: Update
-# def assemble_tlg_author_filepaths() -> list[str]:
-#     """Reads TLG index and builds a list of absolute filepaths."""
-#     plaintext_dir: str = make_cltk_path("grc/text/tlg/plaintext/")
-#     filepaths: list[str] = [os.path.join(plaintext_dir, x + ".TXT") for x in TLG_INDEX]
-#     return filepaths
+# def tlg_plaintext_cleanup(
+#     text: str, rm_punctuation: bool = False, rm_periods: bool = False
+# ) -> str:
+#     """Remove and substitute post-processing for Greek TLG text."""
+#     # Note: flag was removed, is necessary?
+#     remove_comp: Pattern[str] = re.compile(
+#         r"-\n|[«»<>〈〉\(\)‘’_—:!\?\'\"\*]|{[[:print:][:space:]]+?}|\[[[:print:][:space:]]+?\]|[a-zA-Z0-9]",
+#     )
+#     text = remove_comp.sub("", text)
+
+#     if rm_punctuation:
+#         punct_comp: Pattern[str] = re.compile(r",|·")
+#         text = punct_comp.sub("", text)
+
+#     if rm_periods:
+#         period_comp: Pattern[str] = re.compile(r"\.|;")
+#         text = period_comp.sub("", text)
+
+#     # replace line breaks w/ space
+#     replace_comp: Pattern[str] = re.compile(r"\n")
+#     text = replace_comp.sub(" ", text)
+
+#     comp_space: Pattern[str] = re.compile(r"\s+")
+#     text = comp_space.sub(" ", text)
+
+#     return text
+
 
 # TODO: Update
 # def assemble_tlg_works_filepaths() -> list[str]:

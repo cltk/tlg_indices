@@ -11,7 +11,13 @@ from tlg_indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
 from tlg_indices.female_author_ids import FEMINAE
 from tlg_indices.geography_to_author_id import GEO_TO_AUTHOR_ID
 from tlg_indices.tlg_indices import ALL_TLG_INDICES
-# from tlg_indices.author_ids_to_work_ids_and_work_names import WORK_NUMBERS
+
+
+__author__ = [
+    "Kyle P. Johnson <kyle@kyle-p-johnson.com>",
+    "Stephen Margheim <stephen.margheim@gmail.com>",
+    "Martín Pozzi <marpozzi@gmail.com>",
+]
 
 # Allows an O(1) lookup
 _EPITHET_INDEX_CASEFOLD: dict[str, list[AuthorID]] = {
@@ -41,7 +47,12 @@ def get_indices() -> dict[str, dict[str, str]]:
     return ALL_TLG_INDICES
 
 
-def get_female_authors() -> list[str]:
+def get_all_authors_ids() -> list[AuthorID]:
+    """Open author ids index and return sorted list of author ids."""
+    return sorted(AUTHOR_ID_TO_AUTHOR_NAME.keys())
+
+
+def get_female_authors() -> list[AuthorID]:
     """Open female authors index and return sorted list of author ids."""
     return sorted(FEMINAE)
 

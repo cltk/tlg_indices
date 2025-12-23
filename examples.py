@@ -2,9 +2,11 @@
 
 from typing import Optional
 from tlg_indices.data_types import AuthorID, WorkID
+from tlg_indices.file_utils import assemble_tlg_author_filepaths
 from tlg_indices.utils import (
     ParsedDate,
     author_id_to_author_name,
+    get_all_authors_ids,
     get_author_id_from_author_name,
     get_author_name_from_author_id,
     get_author_works_index,
@@ -29,7 +31,10 @@ from tlg_indices.utils import (
 
 
 def main() -> None:
-    female_authors: list[str] = get_female_authors()
+    all_authors: list[AuthorID] = get_all_authors_ids()
+    print("All authors:", all_authors)
+
+    female_authors: list[AuthorID] = get_female_authors()
     print("Female authors:", female_authors)
 
     epithets: list[str] = get_epithets()
@@ -158,6 +163,10 @@ def main() -> None:
         special="Incertum",
     )
     print("Special date range (Incertum):", get_dates_in_range(special_range))
+
+    # Text loading
+    tlg_filepaths = assemble_tlg_author_filepaths(corpus_dir="~/corpora/tlg/plaintext")
+    print("TLG filepaths:", tlg_filepaths)
 
 
 if __name__ == "__main__":
