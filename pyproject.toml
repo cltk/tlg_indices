@@ -1,7 +1,7 @@
 [project]
-name = "tlg-canon"
-version = "1.0.0"
-description = "Browse TLG canon data and indices"
+name = "tlg-indices"
+version = "1.0.1"
+description = "Browse TLG indices"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = []
