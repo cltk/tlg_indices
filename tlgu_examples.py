@@ -58,18 +58,18 @@ def main() -> None:
         overwrite=True,
     )
 
-    # # Convert entire PHI5 corpus into author files
-    # tlgu_convert_corpus(
-    #     orig_txt_dir="/Users/kylepjohnson/phi5/PHI5",
-    #     target_txt_dir="/Users/kylepjohnson/Downloads/phi5-authors",
-    #     corpus="phi5",
-    #     grouping="author",
-    #     overwrite=True,
-    # )
+    # Convert entire PHI5 corpus into author files
+    tlgu_convert_corpus(
+        orig_txt_dir="/Users/kylepjohnson/tlg/PHI5",
+        target_txt_dir="/Users/kylepjohnson/Downloads/phi5-authors",
+        corpus="phi5",
+        grouping="author",
+        overwrite=True,
+    )
 
     # # Convert entire PHI5 corpus into work files
     # tlgu_convert_corpus(
-    #     orig_txt_dir="/Users/kylepjohnson/phi5/PHI5",
+    #     orig_txt_dir="/Users/kylepjohnson/tlg/PHI5",
     #     target_txt_dir="/Users/kylepjohnson/Downloads/phi5-works",
     #     corpus="phi5",
     #     grouping="work",
