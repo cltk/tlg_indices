@@ -1,6 +1,6 @@
 [project]
 name = "tlg-indices"
-version = "1.2.1"
+version = "1.2.2"
 description = "Browse TLG indices"
 readme = "README.md"
 requires-python = ">=3.13"

@@ -3,13 +3,13 @@
 from dataclasses import dataclass
 import re
 from typing import Optional, Union
-from tlg_indices.author_id_to_author_name import AUTHOR_ID_TO_AUTHOR_NAME
-from tlg_indices.author_ids_to_works import AUTHOR_ID_TO_WORKS
+from tlg_indices.indices.author_id_to_author_name import AUTHOR_ID_TO_AUTHOR_NAME
+from tlg_indices.indices.author_ids_to_works import AUTHOR_ID_TO_WORKS
 from tlg_indices.data_types import AuthorID, WorkID
-from tlg_indices.date_to_author_id import MAP_DATE_TO_AUTHORS
-from tlg_indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
-from tlg_indices.female_author_ids import FEMINAE
-from tlg_indices.geography_to_author_id import GEO_TO_AUTHOR_ID
+from tlg_indices.indices.date_to_author_id import MAP_DATE_TO_AUTHORS
+from tlg_indices.indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
+from tlg_indices.indices.female_author_ids import FEMINAE
+from tlg_indices.indices.geography_to_author_id import GEO_TO_AUTHOR_ID
 from tlg_indices.tlg_indices import ALL_TLG_INDICES
 
 

@@ -11,7 +11,7 @@ from re import Pattern
 from tlg_indices.data_types import AuthorID
 from tlg_indices.utils import get_all_authors_ids
 
-from .author_id_to_name import TLG_INDEX, TLG_WORKS_INDEX
+from tlg_indices.indices.author_id_to_name import TLG_INDEX, TLG_WORKS_INDEX
 
 
 def assemble_tlg_author_filepaths(corpus_dir: str) -> list[str]:
