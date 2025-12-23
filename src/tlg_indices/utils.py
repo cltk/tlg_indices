@@ -1,5 +1,6 @@
 """Read and return data from the author index files."""
 
+from typing import Optional, Union
 from tlg_indices.data_types import AuthorID
 from tlg_indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
 from tlg_indices.female_author_ids import FEMINAE
@@ -7,6 +8,12 @@ from tlg_indices.female_author_ids import FEMINAE
 # Allows an O(1) lookup
 _EPITHET_INDEX_CASEFOLD: dict[str, list[AuthorID]] = {
     key.casefold(): value for key, value in MAP_EPITHET_TO_AUTHOR_IDS.items()
+}
+# Reverse index
+_AUTHOR_ID_TO_EPITHET: dict[AuthorID, str] = {
+    author_id: epithet
+    for epithet, author_ids in MAP_EPITHET_TO_AUTHOR_IDS.items()
+    for author_id in author_ids
 }
 
 
@@ -37,8 +44,6 @@ def select_authors_by_epithet(epithet: str) -> list[AuthorID]:
     return sorted(ids)
 
 
-# def get_epithet_of_author(_id: str) -> str:
-#     """Pass author id and return the name of its associated epithet."""
-#     for epithet, ids in MAP_EPITHET_TO_AUTHOR_IDS.items():
-#         if _id in ids:
-#             return epithet
+def get_epithet_of_author(author_id: Union[AuthorID, str]) -> Optional[str]:
+    """Pass author id and return the name of its associated epithet."""
+    return _AUTHOR_ID_TO_EPITHET.get(AuthorID(author_id))

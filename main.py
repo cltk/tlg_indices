@@ -2,6 +2,7 @@
 
 from tlg_indices.data_types import AuthorID
 from tlg_indices.utils import (
+    get_epithet_of_author,
     get_female_authors,
     get_epithet_index,
     get_epithets,
@@ -22,6 +23,10 @@ def main():
     epithet: str = "Poetae Medici"
     authors: list[AuthorID] = select_authors_by_epithet(epithet=epithet)
     print(f"Authors with epithet '{epithet}':", authors)
+
+    author_id: str = "9020"
+    epithet_of_author = get_epithet_of_author(author_id=author_id)
+    print(f"Epithet of author '{author_id}':", epithet_of_author)
 
 
 if __name__ == "__main__":
