@@ -42,12 +42,14 @@ from typing import Literal, Optional
 # }
 
 corpusTypes = Literal["tlg", "phi5", "phi7"]
+groupingTypes = Literal["author", "work"]
 
 
 def tlgu_convert_file(
     orig_txt_path: str,
     target_txt_path: str,
     corpus: corpusTypes,
+    grouping: groupingTypes,
     overwrite: bool = False,
 ) -> None:
     """Call `tlgu` to convert a single file."""
@@ -56,25 +58,56 @@ def tlgu_convert_file(
     if not orig_path.exists():
         raise FileNotFoundError(f"File '{orig_path}' does not exist.")
     target_name = target_path.name
+    if target_name.startswith("DOCCAN"):
+        print("Skipping 'DOCCAN*' file:", orig_path)
+        return None
     if target_name.lower().startswith("tlg"):
         target_name = target_name[3:]
     if target_name.endswith(".TXT"):
         target_name = f"{target_name[:-4]}.txt"
+    if grouping == "work":
+        target_name = target_name.rstrip(".txt")
     target_path = target_path.with_name(target_name)
     if target_path.exists() and not overwrite:
         raise FileNotFoundError(
             f"Target file '{target_path}' already exists. Use `overwrite=True` to overwrite."
         )
-    tlgu_call: str = f"tlgu -N {orig_path} {target_path}"
+    tlgu_call: str
+    grouping_flag: str
+    if grouping == "author":
+        grouping_flag = "-N"
+    elif grouping == "work":
+        grouping_flag = "-W"
+    else:
+        raise ValueError(f"Invalid grouping '{grouping}'.")
+    if corpus == "tlg":
+        tlgu_call = f"tlgu {grouping_flag} {orig_path} {target_path}"
+    elif corpus == "phi5":
+        tlgu_call = f"tlgu {grouping_flag} {orig_path} {target_path}"
+    # elif corpus == "phi7":
+    #     tlgu_call = f"tlgu {grouping_flag} {orig_path} {target_path}"
+    else:
+        raise ValueError(f"Invalid corpus '{corpus}'.")
     print("Going to call tlgu with:", tlgu_call)
     subprocess.call(tlgu_call, shell=True)
-    if not target_path.exists():
-        raise FileNotFoundError(f"Failed to create file: {target_path}")
+    if grouping == "author":
+        if not target_path.exists():
+            raise FileNotFoundError(f"Failed to create file: {target_path}")
+    else:
+        work_glob = f"{target_path.stem}-*.txt"
+        if not any(target_path.parent.glob(work_glob)):
+            raise FileNotFoundError(
+                f"Failed to create work files matching: {target_path.parent / work_glob}"
+            )
     return None
 
 
 def tlgu_convert_corpus(
-    orig_txt_dir: str, target_txt_dir: str, corpus: corpusTypes, overwrite: bool = False
+    orig_txt_dir: str,
+    target_txt_dir: str,
+    corpus: corpusTypes,
+    grouping: groupingTypes,
+    overwrite: bool = False,
 ) -> None:
     """Convert an entire TLG, PHI5 or PHI7 corpus."""
     orig_txt_dir = os.path.expanduser(orig_txt_dir)
@@ -83,7 +116,7 @@ def tlgu_convert_corpus(
         raise FileNotFoundError(f"Directory '{orig_txt_dir}' does not exist.")
     if not os.path.exists(target_txt_dir):
         os.makedirs(target_txt_dir)
-    for orig_txt_file in os.listdir(orig_txt_dir):
+    for orig_txt_file in sorted(os.listdir(orig_txt_dir)):
         if orig_txt_file.endswith("TXT"):
             orig_txt_path: str = os.path.join(orig_txt_dir, orig_txt_file)
             target_txt_path: str = os.path.join(target_txt_dir, orig_txt_file)
@@ -91,6 +124,7 @@ def tlgu_convert_corpus(
                 orig_txt_path=orig_txt_path,
                 target_txt_path=target_txt_path,
                 corpus=corpus,
+                grouping=grouping,
                 overwrite=overwrite,
             )
     return None
@@ -256,66 +290,66 @@ class TLGU:
     #         # logger.error("Failed to convert %s to %s: %s", input_path, output_path, exc)
     #         raise
 
-    def convert_corpus():
-        # orig_path: str = make_cltk_path("originals")
-        # target_path: str = make_cltk_path()
-        assert corpus in [
-            "tlg",
-            "phi5",
-            "phi7",
-        ], "Corpus must be 'tlg', 'phi5', or 'phi7'"
-        if corpus in ["tlg", "phi5", "phi7"]:
-            orig_path = os.path.join(orig_path, corpus)
-            if corpus in ["tlg", "phi7"]:
-                if "phi7" and lat is True:
-                    lat = True
-                    target_path = os.path.join(target_path, "lat", "text", corpus)
-                else:
-                    lat = False
-                    target_path = os.path.join(target_path, "grc", "text", corpus)
-            else:
-                target_path = os.path.join(target_path, "lat", "text", corpus)
-                lat = True
-        try:
-            corpus_files: list[str] = os.listdir(orig_path)
-        except Exception as exception:
-            # logger.error("Failed to find TLG files: %s", exception)
-            raise
-        # make a list of files to be converted
-        txts: list[str] = [x for x in corpus_files if x.endswith("TXT")]
-        # loop through list and convert one at a time
-        for txt in txts:
-            orig_txt_path: str = os.path.join(orig_path, txt)
-            target_txt_dir: Optional[str] = None
-            if markup is None:
-                target_txt_dir = os.path.join(target_path, "plaintext")
-            else:
-                target_txt_dir = os.path.join(target_path, str(markup))
-            if not os.path.isdir(target_txt_dir):
-                os.makedirs(target_txt_dir)
-            target_txt_path: str = os.path.join(target_txt_dir, txt)
-            try:
-                # tlgu command: `tlgu -N /Users/kylepjohnson/tlg/TLG_E/TLG0007.TXT ~/Downloads/0007.txt`
-                tlgu_call: str = f"tlgu -N {orig_txt_path} {target_txt_path}"
-                print(tlgu_call)
-                subprocess.call(tlgu_call, shell=True)
-                # self.convert(
-                #     orig_txt_path,
-                #     target_txt_path,
-                #     markup=None,
-                #     rm_newlines=False,
-                #     divide_works=False,
-                #     lat=lat,
-                #     extra_args=None,
-                # )
-            except Exception as exception:
-                # logger.error(
-                #     "Failed to convert file '%s' to '%s': %s",
-                #     orig_txt_path,
-                #     target_txt_path,
-                #     exception,
-                # )
-                raise
+    # def convert_corpus():
+    #     # orig_path: str = make_cltk_path("originals")
+    #     # target_path: str = make_cltk_path()
+    #     assert corpus in [
+    #         "tlg",
+    #         "phi5",
+    #         "phi7",
+    #     ], "Corpus must be 'tlg', 'phi5', or 'phi7'"
+    #     if corpus in ["tlg", "phi5", "phi7"]:
+    #         orig_path = os.path.join(orig_path, corpus)
+    #         if corpus in ["tlg", "phi7"]:
+    #             if "phi7" and lat is True:
+    #                 lat = True
+    #                 target_path = os.path.join(target_path, "lat", "text", corpus)
+    #             else:
+    #                 lat = False
+    #                 target_path = os.path.join(target_path, "grc", "text", corpus)
+    #         else:
+    #             target_path = os.path.join(target_path, "lat", "text", corpus)
+    #             lat = True
+    #     try:
+    #         corpus_files: list[str] = os.listdir(orig_path)
+    #     except Exception as exception:
+    #         # logger.error("Failed to find TLG files: %s", exception)
+    #         raise
+    #     # make a list of files to be converted
+    #     txts: list[str] = [x for x in corpus_files if x.endswith("TXT")]
+    #     # loop through list and convert one at a time
+    #     for txt in txts:
+    #         orig_txt_path: str = os.path.join(orig_path, txt)
+    #         target_txt_dir: Optional[str] = None
+    #         if markup is None:
+    #             target_txt_dir = os.path.join(target_path, "plaintext")
+    #         else:
+    #             target_txt_dir = os.path.join(target_path, str(markup))
+    #         if not os.path.isdir(target_txt_dir):
+    #             os.makedirs(target_txt_dir)
+    #         target_txt_path: str = os.path.join(target_txt_dir, txt)
+    #         try:
+    #             # tlgu command: `tlgu -N /Users/kylepjohnson/tlg/TLG_E/TLG0007.TXT ~/Downloads/0007.txt`
+    #             tlgu_call: str = f"tlgu -N {orig_txt_path} {target_txt_path}"
+    #             print(tlgu_call)
+    #             subprocess.call(tlgu_call, shell=True)
+    #             # self.convert(
+    #             #     orig_txt_path,
+    #             #     target_txt_path,
+    #             #     markup=None,
+    #             #     rm_newlines=False,
+    #             #     divide_works=False,
+    #             #     lat=lat,
+    #             #     extra_args=None,
+    #             # )
+    #         except Exception as exception:
+    #             # logger.error(
+    #             #     "Failed to convert file '%s' to '%s': %s",
+    #             #     orig_txt_path,
+    #             #     target_txt_path,
+    #             #     exception,
+    #             # )
+    #             raise
 
     # def divide_works(self, corpus: str) -> None:
     #     """Use the work-breaking option.
@@ -359,18 +393,38 @@ class TLGU:
 
 
 if __name__ == "__main__":
-    # Convert a single file
+    # Convert a single file into author file
     tlgu_convert_file(
         orig_txt_path="/Users/kylepjohnson/tlg/TLG_E/TLG0007.TXT",
         target_txt_path="/Users/kylepjohnson/Downloads/0007.txt",
         corpus="tlg",
+        grouping="author",
         overwrite=True,
     )
 
-    # Convert entire corpus
+    # Convert a single file into works files
+    tlgu_convert_file(
+        orig_txt_path="/Users/kylepjohnson/tlg/TLG_E/TLG0007.TXT",
+        target_txt_path="/Users/kylepjohnson/Downloads/0007",
+        corpus="tlg",
+        grouping="work",
+        overwrite=True,
+    )
+
+    # Convert entire corpus into author files
     tlgu_convert_corpus(
         orig_txt_dir="/Users/kylepjohnson/tlg/TLG_E",
-        target_txt_dir="/Users/kylepjohnson/Downloads/tlg",
+        target_txt_dir="/Users/kylepjohnson/Downloads/tlg-authors",
         corpus="tlg",
+        grouping="author",
+        overwrite=True,
+    )
+
+    # Convert entire corpus into work files
+    tlgu_convert_corpus(
+        orig_txt_dir="/Users/kylepjohnson/tlg/TLG_E",
+        target_txt_dir="/Users/kylepjohnson/Downloads/tlg-works",
+        corpus="tlg",
+        grouping="work",
         overwrite=True,
     )
