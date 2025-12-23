@@ -9,7 +9,7 @@ from re import Pattern
 
 from .date_to_author_id import MAP_DATE_TO_AUTHORS
 from .epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
-from .geography_to_author_id import AUTHOR_GEO
+from .geography_to_author_id import GEO_TO_AUTHOR_ID
 from .author_id_to_author_name import ID_AUTHOR
 from .tlg_indices import ALL_TLG_INDICES
 from .author_ids_to_work_ids_and_work_names import WORK_NUMBERS
@@ -21,37 +21,6 @@ __author__ = [
 ]
 
 THIS_DIR = os.path.dirname(os.path.abspath(__file__))
-
-
-def get_geo_index() -> dict[str, set[str]]:
-    """Get entire index of geographic name (key) and
-    set of associated authors (value).
-    """
-    _dict: dict[str, set[str]] = dict()
-    for key, val in MAP_EPITHET_TO_AUTHOR_IDS.items():
-        _dict[key] = set(val)
-    return _dict
-
-
-def get_geographies() -> list[str]:
-    """Return a list of all the epithet labels."""
-    return sorted(AUTHOR_GEO.keys())
-
-
-def select_authors_by_geo(query: str) -> set[str]:
-    """Pass exact name (case-insensitive) of
-    geography name, return ordered set of author ids.
-    """
-    for geo, ids in AUTHOR_GEO.items():
-        if geo.casefold() == query.casefold():
-            return set(ids)
-
-
-def get_geo_of_author(_id: str) -> str:
-    """Pass author id and return the name of its associated epithet."""
-    for geo, ids in AUTHOR_GEO.items():
-        if _id in ids:
-            return geo
 
 
 def get_lists() -> dict[str, dict[str, str]]:
