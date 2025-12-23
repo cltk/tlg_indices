@@ -138,10 +138,9 @@ def get_date_author() -> dict[str, list[AuthorID]]:
     return MAP_DATE_TO_AUTHORS
 
 
-def get_dates():
+def get_dates() -> list[str]:
     """Return a list of all the date epithet labels."""
-    map_date_to_authors: dict[str, list[str]] = get_date_author()
-    return sorted(map_date_to_authors.keys())
+    return sorted(MAP_DATE_TO_AUTHORS.keys())
 
 
 def get_date_of_author(_id):

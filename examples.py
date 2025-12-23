@@ -79,5 +79,8 @@ def main() -> None:
     date_author_index: dict[str, list[AuthorID]] = get_date_author()
     print("Date author index:", date_author_index)
 
+    dates: list[str] = get_dates()
+    print("Dates:", dates)
+
 if __name__ == "__main__":
     main()

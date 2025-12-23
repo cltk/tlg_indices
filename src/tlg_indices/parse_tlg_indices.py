@@ -2,12 +2,11 @@
 
 import json
 import os
-from typing import NewType, Optional
+from typing import Optional
 
 import re
 from re import Pattern
 
-from .date_to_author_id import MAP_DATE_TO_AUTHORS
 
 
 __author__ = [
