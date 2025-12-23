@@ -25,26 +25,6 @@ def open_json(_file):
         return json.load(f)
 
 
-def get_date_author() -> dict[str, list[str]]:
-    """Returns entirety of date-author index."""
-    return MAP_DATE_TO_AUTHORS
-
-
-def get_dates():
-    """Return a list of all the date epithet labels."""
-    map_date_to_authors: dict[str, list[str]] = get_date_author()
-    return sorted(map_date_to_authors.keys())
-
-
-def get_date_of_author(_id):
-    """Pass author id and return the name of its associated date."""
-    map_date_to_authors: dict[str, list[str]] = get_date_author()
-    for date, ids in map_date_to_authors.items():
-        if _id in ids:
-            return date
-    return None
-
-
 def _get_epoch(_str) -> Optional[str]:
     """Take incoming string, return its epoch."""
     _return = None

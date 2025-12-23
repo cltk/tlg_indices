@@ -4,6 +4,7 @@ from typing import Optional, Union
 from tlg_indices.author_id_to_author_name import AUTHOR_ID_TO_AUTHOR_NAME
 from tlg_indices.author_ids_to_works import AUTHOR_ID_TO_WORKS
 from tlg_indices.data_types import AuthorID, WorkID
+from tlg_indices.date_to_author_id import MAP_DATE_TO_AUTHORS
 from tlg_indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
 from tlg_indices.female_author_ids import FEMINAE
 from tlg_indices.geography_to_author_id import GEO_TO_AUTHOR_ID
@@ -130,3 +131,23 @@ def get_work_name(
     if works is None:
         return None
     return works.get(WorkID(work_id))
+
+
+def get_date_author() -> dict[str, list[AuthorID]]:
+    """Returns entirety of date-author index."""
+    return MAP_DATE_TO_AUTHORS
+
+
+def get_dates():
+    """Return a list of all the date epithet labels."""
+    map_date_to_authors: dict[str, list[str]] = get_date_author()
+    return sorted(map_date_to_authors.keys())
+
+
+def get_date_of_author(_id):
+    """Pass author id and return the name of its associated date."""
+    map_date_to_authors: dict[str, list[str]] = get_date_author()
+    for date, ids in map_date_to_authors.items():
+        if _id in ids:
+            return date
+    return None

@@ -7,6 +7,7 @@ from tlg_indices.utils import (
     get_author_id_from_author_name,
     get_author_name_from_author_id,
     get_author_works_index,
+    get_date_author,
     get_work_name,
     get_epithet_of_author,
     get_female_authors,
@@ -75,6 +76,8 @@ def main() -> None:
     work_name: Optional[str] = get_work_name(author_id=author_id, work_id=work_id)
     print(f"Work name for author '{author_id}' and work '{work_id}':", work_name)
 
+    date_author_index: dict[str, list[AuthorID]] = get_date_author()
+    print("Date author index:", date_author_index)
 
 if __name__ == "__main__":
     main()
