@@ -3,12 +3,14 @@
 from typing import Optional
 from tlg_indices.data_types import AuthorID, WorkID
 from tlg_indices.utils import (
+    ParsedDate,
     author_id_to_author_name,
     get_author_id_from_author_name,
     get_author_name_from_author_id,
     get_author_works_index,
     get_date_author,
     get_date_of_author,
+    get_dates_in_range,
     get_dates,
     get_date_sort_key,
     get_work_name,
@@ -91,6 +93,71 @@ def main() -> None:
 
     sorted_dates = sorted(dates, key=get_date_sort_key)
     print("Sorted dates:", sorted_dates)
+
+    ad_range = ParsedDate(
+        raw=None,
+        start_century=1,
+        start_era="A.D.",
+        end_century=4,
+        end_era="A.D.",
+        start_qualifier=None,
+        end_qualifier=None,
+        uncertain=False,
+        special=None,
+    )
+    print("Dates in A.D. 1-4 range:", get_dates_in_range(ad_range))
+
+    bc_range = ParsedDate(
+        raw=None,
+        start_century=4,
+        start_era="B.C.",
+        end_century=2,
+        end_era="B.C.",
+        start_qualifier=None,
+        end_qualifier=None,
+        uncertain=False,
+        special=None,
+    )
+    print("Dates in 4-2 B.C. range:", get_dates_in_range(bc_range))
+
+    cross_range = ParsedDate(
+        raw=None,
+        start_century=1,
+        start_era="B.C.",
+        end_century=1,
+        end_era="A.D.",
+        start_qualifier=None,
+        end_qualifier=None,
+        uncertain=False,
+        special=None,
+    )
+    print("Dates across B.C./A.D. boundary:", get_dates_in_range(cross_range))
+
+    ante_range = ParsedDate(
+        raw=None,
+        start_century=2,
+        start_era="A.D.",
+        end_century=2,
+        end_era="A.D.",
+        start_qualifier="a",
+        end_qualifier=None,
+        uncertain=False,
+        special=None,
+    )
+    print("Dates in a. A.D. 2 range:", get_dates_in_range(ante_range))
+
+    special_range = ParsedDate(
+        raw=None,
+        start_century=None,
+        start_era=None,
+        end_century=None,
+        end_era=None,
+        start_qualifier=None,
+        end_qualifier=None,
+        uncertain=False,
+        special="Incertum",
+    )
+    print("Special date range (Incertum):", get_dates_in_range(special_range))
 
 
 if __name__ == "__main__":

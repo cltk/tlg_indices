@@ -165,14 +165,16 @@ _SPECIAL_DATE_SORT_KEYS: dict[str, tuple[int, int, int, int, str]] = {
 }
 _QUALIFIER_RE = re.compile(r"^\s*([ap])\.\s*", re.IGNORECASE)
 _ERA_RE = re.compile(r"(A\.D\.|B\.C\.)", re.IGNORECASE)
-_YEAR_RE = re.compile(r"(\d+)")
+_CENTURY_RE = re.compile(r"(\d+)")
 
 
 @dataclass(frozen=True)
 class ParsedDate:
-    raw: str
-    start_year: Optional[int]
-    end_year: Optional[int]
+    raw: Optional[str]
+    start_century: Optional[int]
+    start_era: Optional[str]
+    end_century: Optional[int]
+    end_era: Optional[str]
     start_qualifier: Optional[str]
     end_qualifier: Optional[str]
     uncertain: bool
@@ -183,7 +185,7 @@ class ParsedDate:
         return get_date_sort_key(self)
 
 
-def _parse_date_part(
+def _parse_century_part(
     part: str, default_era: Optional[str]
 ) -> tuple[Optional[int], Optional[str], Optional[str]]:
     part = part.strip()
@@ -199,17 +201,14 @@ def _parse_date_part(
         era = "AD" if era_token.startswith("A") else "BC"
         part = _ERA_RE.sub("", part)
     part = part.replace("?", "")
-    year_match = _YEAR_RE.search(part)
-    if not year_match:
+    century_match = _CENTURY_RE.search(part)
+    if not century_match:
         return None, era or default_era, qualifier
-    year = int(year_match.group(1))
+    century = int(century_match.group(1))
     era = era or default_era
     if era is None:
         return None, None, qualifier
-    if era == "BC":
-        # Use astronomical year numbering: 1 B.C. -> 0, 2 B.C. -> -1.
-        year = 1 - year
-    return year, era, qualifier
+    return century, era, qualifier
 
 
 def _qualifier_rank(parsed: "ParsedDate") -> int:
@@ -222,14 +221,53 @@ def _qualifier_rank(parsed: "ParsedDate") -> int:
     return 0
 
 
-def parse_tlg_date(raw: str) -> ParsedDate:
-    """Parse TLG date strings into a structured form."""
+def _normalize_era(era: Optional[str]) -> Optional[str]:
+    if era is None:
+        return None
+    normalized = era.strip().upper()
+    if normalized in {"AD", "A.D."}:
+        return "AD"
+    if normalized in {"BC", "B.C."}:
+        return "BC"
+    return None
+
+
+def _century_bounds(century: int, era: Optional[str]) -> Optional[tuple[int, int]]:
+    era = _normalize_era(era)
+    if era is None or century < 1:
+        return None
+    start_year = (century - 1) * 100 + 1
+    end_year = century * 100
+    if era == "BC":
+        start = 1 - end_year
+        end = 1 - start_year
+        return (start, end)
+    return (start_year, end_year)
+
+
+def _century_range_bounds(
+    start_century: int,
+    start_era: Optional[str],
+    end_century: int,
+    end_era: Optional[str],
+) -> Optional[tuple[int, int]]:
+    start_bounds = _century_bounds(start_century, start_era)
+    end_bounds = _century_bounds(end_century, end_era)
+    if start_bounds is None or end_bounds is None:
+        return None
+    return (min(start_bounds[0], end_bounds[0]), max(start_bounds[1], end_bounds[1]))
+
+
+def _parse_tlg_date(raw: str) -> ParsedDate:
+    """Parse TLG date strings into a century-based structured form."""
     raw = raw.strip()
     if raw in _SPECIAL_DATE_SORT_KEYS:
         return ParsedDate(
             raw=raw,
-            start_year=None,
-            end_year=None,
+            start_century=None,
+            start_era=None,
+            end_century=None,
+            end_era=None,
             start_qualifier=None,
             end_qualifier=None,
             uncertain=False,
@@ -242,16 +280,20 @@ def parse_tlg_date(raw: str) -> ParsedDate:
     else:
         start_raw = normalized
         end_raw = normalized
-    start_year, start_era, start_qualifier = _parse_date_part(start_raw, None)
-    end_year, end_era, end_qualifier = _parse_date_part(end_raw, start_era)
+    start_century, start_era, start_qualifier = _parse_century_part(start_raw, None)
+    end_century, end_era, end_qualifier = _parse_century_part(end_raw, start_era)
     if start_era is None and end_era is not None:
-        start_year, start_era, start_qualifier = _parse_date_part(start_raw, end_era)
+        start_century, start_era, start_qualifier = _parse_century_part(
+            start_raw, end_era
+        )
     if end_era is None and start_era is not None:
-        end_year, end_era, end_qualifier = _parse_date_part(end_raw, start_era)
+        end_century, end_era, end_qualifier = _parse_century_part(end_raw, start_era)
     return ParsedDate(
         raw=raw,
-        start_year=start_year,
-        end_year=end_year,
+        start_century=start_century,
+        start_era=start_era,
+        end_century=end_century,
+        end_era=end_era,
         start_qualifier=start_qualifier,
         end_qualifier=end_qualifier,
         uncertain=uncertain,
@@ -263,13 +305,79 @@ def get_date_sort_key(
     date_value: Union[str, "ParsedDate"],
 ) -> tuple[int, int, int, int, str]:
     """Return a stable sort key for TLG date values."""
-    parsed = parse_tlg_date(date_value) if isinstance(date_value, str) else date_value
+    parsed = _parse_tlg_date(date_value) if isinstance(date_value, str) else date_value
     if parsed.special:
         return _SPECIAL_DATE_SORT_KEYS[parsed.special]
-    start_year = (
-        parsed.start_year if parsed.start_year is not None else _DATE_SORT_SENTINEL
+    start_era = _normalize_era(parsed.start_era)
+    end_era = _normalize_era(parsed.end_era) or start_era
+    start_century = parsed.start_century
+    end_century = (
+        parsed.end_century if parsed.end_century is not None else start_century
     )
-    end_year = parsed.end_year if parsed.end_year is not None else _DATE_SORT_SENTINEL
+    if start_century is None or end_century is None:
+        start_numeric = _DATE_SORT_SENTINEL
+        end_numeric = _DATE_SORT_SENTINEL
+    else:
+        bounds = _century_range_bounds(start_century, start_era, end_century, end_era)
+        if bounds is None:
+            start_numeric = _DATE_SORT_SENTINEL
+            end_numeric = _DATE_SORT_SENTINEL
+        else:
+            start_numeric, end_numeric = bounds
     qualifier_rank = _qualifier_rank(parsed)
     uncertain_rank = 1 if parsed.uncertain else 0
-    return (start_year, end_year, qualifier_rank, uncertain_rank, parsed.raw)
+    return (
+        start_numeric,
+        end_numeric,
+        qualifier_rank,
+        uncertain_rank,
+        parsed.raw or "",
+    )
+
+
+_PARSED_DATE_INDEX: dict[str, ParsedDate] = {
+    raw: _parse_tlg_date(raw) for raw in MAP_DATE_TO_AUTHORS.keys()
+}
+
+
+def _ranges_overlap(start_a: int, end_a: int, start_b: int, end_b: int) -> bool:
+    return max(start_a, start_b) <= min(end_a, end_b)
+
+
+def get_dates_in_range(date_range: ParsedDate) -> list[str]:
+    """Return date labels that overlap a parsed century range."""
+    if date_range.special:
+        return [date_range.special] if date_range.special in MAP_DATE_TO_AUTHORS else []
+    if date_range.start_century is None:
+        return []
+    start_era = _normalize_era(date_range.start_era)
+    end_era = _normalize_era(date_range.end_era) or start_era
+    end_century = (
+        date_range.end_century
+        if date_range.end_century is not None
+        else date_range.start_century
+    )
+    if end_century is None:
+        return []
+    query_bounds = _century_range_bounds(
+        date_range.start_century, start_era, end_century, end_era
+    )
+    if query_bounds is None:
+        return []
+    query_start, query_end = query_bounds
+    matches: list[str] = []
+    for raw, parsed in _PARSED_DATE_INDEX.items():
+        if parsed.special or parsed.start_century is None or parsed.end_century is None:
+            continue
+        parsed_end_era = parsed.end_era or parsed.start_era
+        parsed_bounds = _century_range_bounds(
+            parsed.start_century,
+            parsed.start_era,
+            parsed.end_century,
+            parsed_end_era,
+        )
+        if parsed_bounds is None:
+            continue
+        if _ranges_overlap(query_start, query_end, parsed_bounds[0], parsed_bounds[1]):
+            matches.append(raw)
+    return sorted(matches, key=get_date_sort_key)
