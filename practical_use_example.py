@@ -23,7 +23,9 @@ for filepath in tlg_works_filepaths:
     with open(filepath, "r") as file:
         content = file.read()
     content = tlg_plaintext_cleanup(content)
-    print(f"Cleaned content of {filepath}: {content[:1000]}")  # Print first 100 characters of cleaned content
+    print(
+        f"Cleaned content of {filepath}: {content[:1000]}"
+    )  # Print first 100 characters of cleaned content
     input()
 
     # Do further processing with cleaned content
