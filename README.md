@@ -19,6 +19,7 @@ pip install tlg-indices
 See also `practical_use_example.py`.
 
 ```python
+from tlg_indices.text_cleaning import tlg_plaintext_cleanup
 from tlg_indices.tlgu import tlgu_convert_corpus
 from tlg_indices.file_utils import assemble_tlg_works_filepaths
 
@@ -29,7 +30,6 @@ tlgu_convert_corpus(
     target_txt_dir=conveted_tlg_dir,
     corpus="tlg",
     grouping="work",
-    overwrite=False,
 )
 
 # Get filepaths of converted TLG works
@@ -43,7 +43,11 @@ for filepath in tlg_works_filepaths:
     print(f"Processing: {filepath}")
     with open(filepath, "r") as file:
         content = file.read()
-        print(f"Content of {filepath}: {content[:100]}")  # Print first 100 characters
+    content = tlg_plaintext_cleanup(content)
+    # print(f"Cleaned content of {filepath}: {content[:100]}")  # Print first 100 characters of cleaned content
+
+    # Do further processing with cleaned content
+    # ...
 
 ```
 

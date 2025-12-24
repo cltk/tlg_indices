@@ -39,7 +39,6 @@ def tlgu_convert_file(
     target_txt_path: str,
     corpus: corpusTypes,
     grouping: groupingTypes,
-    overwrite: bool = False,
 ) -> None:
     """Call `tlgu` to convert a single file."""
     orig_path = Path(orig_txt_path).expanduser()
@@ -69,10 +68,6 @@ def tlgu_convert_file(
     if grouping == "work":
         target_name = target_name.rstrip(".txt")
     target_path = target_path.with_name(target_name)
-    if target_path.exists() and not overwrite:
-        raise FileNotFoundError(
-            f"Target file '{target_path}' already exists. Use `overwrite=True` to overwrite."
-        )
     tlgu_call: str
     grouping_flag: str
     if grouping == "author":
@@ -114,7 +109,6 @@ def tlgu_convert_corpus(
     target_txt_dir: str,
     corpus: corpusTypes,
     grouping: groupingTypes,
-    overwrite: bool = False,
 ) -> None:
     """Convert an entire TLG, PHI5 or PHI7 corpus."""
     orig_txt_dir = os.path.expanduser(orig_txt_dir)
@@ -132,6 +126,5 @@ def tlgu_convert_corpus(
                 target_txt_path=target_txt_path,
                 corpus=corpus,
                 grouping=grouping,
-                overwrite=overwrite,
             )
     return None

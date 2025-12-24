@@ -34,15 +34,15 @@ def main() -> None:
     print("TLG work 001 for author 0007:", tlg_single_work)
 
     # PHI5
-    tlg_author_filepaths: list[str] = assemble_phi5_author_filepaths(
+    phi_author_filepaths: list[str] = assemble_phi5_author_filepaths(
         corpus_dir="~/Downloads/phi5-authors/"
     )
-    print("PHI5 filepaths:", tlg_author_filepaths)
+    print("PHI5 filepaths:", phi_author_filepaths)
 
-    tlg_works_filepaths: list[str] = assemble_phi5_works_filepaths(
+    phi_works_filepaths: list[str] = assemble_phi5_works_filepaths(
         corpus_dir="~/Downloads/phi5-works/"
     )
-    print("PHI5 works filepaths:", tlg_works_filepaths)
+    print("PHI5 works filepaths:", phi_works_filepaths)
 
     phi5_author_works: list[str] = assemble_phi5_works_filepaths_for_author(
         corpus_dir="~/Downloads/phi5-works/",

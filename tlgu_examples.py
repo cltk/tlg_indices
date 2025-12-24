@@ -10,7 +10,6 @@ def main() -> None:
         target_txt_path="~/Downloads/0007.txt",
         corpus="tlg",
         grouping="author",
-        overwrite=True,
     )
 
     # Convert a single TLG file into works files
@@ -19,7 +18,6 @@ def main() -> None:
         target_txt_path="~/Downloads/0007",
         corpus="tlg",
         grouping="work",
-        overwrite=True,
     )
 
     # Convert entire TLG corpus into author files
@@ -28,7 +26,6 @@ def main() -> None:
         target_txt_dir="~/Downloads/tlg-authors",
         corpus="tlg",
         grouping="author",
-        overwrite=True,
     )
 
     # Convert entire TLG corpus into work files
@@ -37,7 +34,6 @@ def main() -> None:
         target_txt_dir="~/Downloads/tlg-works",
         corpus="tlg",
         grouping="work",
-        overwrite=True,
     )
 
     # Convert a single PHI5 file into author file
@@ -46,7 +42,6 @@ def main() -> None:
         target_txt_path="~/Downloads/1254.txt",
         corpus="phi5",
         grouping="author",
-        overwrite=True,
     )
 
     # Convert a single PHI5 file into works files
@@ -55,7 +50,6 @@ def main() -> None:
         target_txt_path="~/Downloads/1254",
         corpus="phi5",
         grouping="work",
-        overwrite=True,
     )
 
     # Convert entire PHI5 corpus into author files
@@ -64,7 +58,6 @@ def main() -> None:
         target_txt_dir="~/Downloads/phi5-authors",
         corpus="phi5",
         grouping="author",
-        overwrite=True,
     )
 
     # Convert entire PHI5 corpus into work files
@@ -73,7 +66,6 @@ def main() -> None:
         target_txt_dir="~/Downloads/phi5-works",
         corpus="phi5",
         grouping="work",
-        overwrite=True,
     )
 
 

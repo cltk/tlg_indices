@@ -11,7 +11,7 @@ def tlg_plaintext_cleanup(
     """Remove and substitute post-processing for Greek TLG text."""
     # Note: flag was removed, is necessary?
     remove_comp: Pattern[str] = re.compile(
-        r"-\n|[«»<>〈〉\(\)‘’_—:!\?\'\"\*]|{[[:print:][:space:]]+?}|\[[[:print:][:space:]]+?\]|[a-zA-Z0-9]",
+        r"-\n|[«»<>〈〉\(\)‘’_—:!\?\'\"\*]|{[^}]*}|\[[[:print:][:space:]]+?\]|[a-zA-Z0-9]",
     )
     text = remove_comp.sub("", text)
 
@@ -40,8 +40,8 @@ def phi5_plaintext_cleanup(
     TODO: Surely more junk to pull out. Please submit bugs!
     TODO: This is a rather slow now, help in speeding up welcome.
     """
-    # This works OK, doesn't get some
-    # Note: rming all characters between {} and ()
+    # This works OK, but misses some
+    # Note: Removing all characters between {} and ()
     remove_comp: Pattern[str] = re.compile(
         r"-\n|«|»|\<|\>|\.\.\.|‘|’|_|{.+?}|\(.+?\)|\(|\)|“|#|%|⚔|&|=|/|\\|〚|†|『|⚖|–|˘|⚕|☾|◌|◄|►|⌐|⌊|⌋|≈|∷|≈|∞|”|[0-9]"
     )
