@@ -10,14 +10,8 @@ from tlg_indices.indices.date_to_author_id import MAP_DATE_TO_AUTHORS
 from tlg_indices.indices.epithet_to_author_id import MAP_EPITHET_TO_AUTHOR_IDS
 from tlg_indices.indices.female_author_ids import FEMINAE
 from tlg_indices.indices.geography_to_author_id import GEO_TO_AUTHOR_ID
-from tlg_indices.tlg_indices import ALL_TLG_INDICES
+from tlg_indices.indices.tlg_indices import ALL_TLG_INDICES
 
-
-__author__ = [
-    "Kyle P. Johnson <kyle@kyle-p-johnson.com>",
-    "Stephen Margheim <stephen.margheim@gmail.com>",
-    "Martín Pozzi <marpozzi@gmail.com>",
-]
 
 # Allows an O(1) lookup
 _EPITHET_INDEX_CASEFOLD: dict[str, list[AuthorID]] = {

@@ -1,19 +1,8 @@
 """Wrapper for `tlgu` command line utility.
 
-Original software at: ``http://tlgu.carmen.gr/``.
-
 TLGU software written by Dimitri Marinakis and available at
-`<http://tlgu.carmen.gr/>`_ under GPLv2 license.
-
-TODO: the arguments to ``convert_corpus()`` need some rationalization, and
-``divide_works()`` should be incorporated into it.
-
+<http://tlgu.carmen.gr/> under GPLv2 license.
 """
-
-__author__ = [
-    "Kyle P. Johnson <kyle@kyle-p-johnson.com>",
-    "Stephen Margheim <stephen.margheim@gmail.com>",
-]
 
 import os
 from pathlib import Path
@@ -63,7 +52,12 @@ def tlgu_convert_file(
         print("Skipping 'DOCCAN*' file:", orig_path)
         return None
     # Skip these files in PHI5
-    if target_name.startswith("AUTHTAB") or target_name.startswith("CIV") or target_name.startswith("COP") or target_name.startswith("IND"):
+    if (
+        target_name.startswith("AUTHTAB")
+        or target_name.startswith("CIV")
+        or target_name.startswith("COP")
+        or target_name.startswith("IND")
+    ):
         print("Skipping non-text PHI5 file:", orig_path)
         return None
     if target_name.lower().startswith("tlg"):
