@@ -3,7 +3,7 @@
 from typing import Optional
 
 from tlg_indices.data_types import AuthorID, WorkID
-from tlg_indices.phi5_utils import (
+from tlg_indices.phi5_index_utils import (
     author_id_to_author_name,
     get_all_authors_ids,
     get_author_id_from_author_name,

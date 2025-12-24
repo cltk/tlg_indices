@@ -9,7 +9,7 @@ import re
 from re import Pattern
 
 from tlg_indices.data_types import AuthorID
-from tlg_indices.utils import get_all_authors_ids
+from tlg_indices.tlg_index_utils import get_all_authors_ids
 
 from tlg_indices.indices.author_id_to_name import TLG_INDEX, TLG_WORKS_INDEX
 

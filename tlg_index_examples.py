@@ -3,7 +3,7 @@
 from typing import Optional
 from tlg_indices.data_types import AuthorID, WorkID
 from tlg_indices.file_utils import assemble_tlg_author_filepaths
-from tlg_indices.utils import (
+from tlg_indices.tlg_index_utils import (
     ParsedDate,
     author_id_to_author_name,
     get_all_authors_ids,
