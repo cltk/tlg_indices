@@ -4,12 +4,12 @@ from tlg_indices.file_utils import assemble_tlg_works_filepaths
 
 # Convert entire TLG corpus into author files
 conveted_tlg_dir: str = "~/Downloads/tlg-works"
-tlgu_convert_corpus(
-    orig_txt_dir="~/tlg/TLG_E",
-    target_txt_dir=conveted_tlg_dir,
-    corpus="tlg",
-    grouping="work",
-)
+# tlgu_convert_corpus(
+#     orig_txt_dir="~/tlg/TLG_E",
+#     target_txt_dir=conveted_tlg_dir,
+#     corpus="tlg",
+#     grouping="work",
+# )
 
 # Get filepaths of converted TLG works
 tlg_works_filepaths: list[str] = assemble_tlg_works_filepaths(
@@ -23,7 +23,8 @@ for filepath in tlg_works_filepaths:
     with open(filepath, "r") as file:
         content = file.read()
     content = tlg_plaintext_cleanup(content)
-    # print(f"Cleaned content of {filepath}: {content[:100]}")  # Print first 100 characters of cleaned content
+    print(f"Cleaned content of {filepath}: {content[:1000]}")  # Print first 100 characters of cleaned content
+    input()
 
     # Do further processing with cleaned content
     # ...

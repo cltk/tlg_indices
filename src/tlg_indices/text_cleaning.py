@@ -10,8 +10,15 @@ def tlg_plaintext_cleanup(
 ) -> str:
     """Remove and substitute post-processing for Greek TLG text."""
     # Note: flag was removed, is necessary?
+    # remove_comp: Pattern[str] = re.compile(
+    #     r"-\n|[«»<>〈〉\(\)‘’_—:!\?\'\"\*]|{[^}]*}|\[[[:print:][:space:]]+?\]|[a-zA-Z0-9]",
+    # )
     remove_comp: Pattern[str] = re.compile(
-        r"-\n|[«»<>〈〉\(\)‘’_—:!\?\'\"\*]|{[^}]*}|\[[[:print:][:space:]]+?\]|[a-zA-Z0-9]",
+        r"-\n"                                # hyphen + newline
+        r"|[«»<>〈〉()‘’_—:!?\'\"*]"            # punctuation/symbols
+        r"|{[^}]*}"                           # {...}
+        r"|\[[^\]]+?\]"                       # [...]  (anything except ])
+        r"|[A-Za-z0-9]"                       # ASCII alphanumerics
     )
     text = remove_comp.sub("", text)
 
