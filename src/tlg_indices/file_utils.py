@@ -29,17 +29,18 @@ def assemble_tlg_author_filepaths(corpus_dir: str) -> list[str]:
     return filepaths
 
 
-# TODO: Update
-# def assemble_tlg_works_filepaths() -> list[str]:
-#     """Reads TLG index and builds a list of absolute filepaths."""
-#     plaintext_dir: str = make_cltk_path("grc/text/tlg/individual_works/")
-#     all_filepaths: list[str] = list()
-#     for author_code in TLG_WORKS_INDEX:
-#         author_data: dict[str, Union[list[str], str]] = TLG_WORKS_INDEX[author_code]
-#         works: Union[list[str], str] = author_data["works"]
-#         for work in works:
-#             filepath: str = os.path.join(
-#                 plaintext_dir, author_code + ".TXT" + "-" + work + ".txt"
-#             )
-#             all_filepaths.append(filepath)
-#     return all_filepaths
+def assemble_tlg_works_filepaths(corpus_dir: str) -> list[str]:
+    """Reads TLG index and builds a list of absolute filepaths."""
+    corpus_dir = os.path.expanduser(corpus_dir)
+    if not os.path.exists(corpus_dir):
+        raise FileNotFoundError(f"Directory {corpus_dir} does not exist.")
+    all_filepaths: list[str] = list()
+    for author_code in TLG_WORKS_INDEX:
+        author_data: dict[str, Union[list[str], str]] = TLG_WORKS_INDEX[author_code]
+        works: Union[list[str], str] = author_data["works"]
+        for work in works:
+            filepath: str = os.path.join(
+                corpus_dir, author_code[3:] + "-" + work + ".txt"
+            )
+            all_filepaths.append(filepath)
+    return all_filepaths
