@@ -1,3 +1,7 @@
+# Disclaimer
+
+This repository makes no claim to ownership of the contents of the original TLG CD-ROM, which are owned by the University of California, Irvine. It is an independent effort to facilitate study of texts and does not represent or imply endorsement by the University of California, Irvine or the TLG project.
+
 # About
 
 This Python package facilitates the browsing of the indices of the old TLG CD-ROMs. It expects that texts have been processed by the `tlgu` package ([tlgu homepage](https://tlgu.carmen.gr/), [rehosted code](https://github.com/cltk/grc_software_tlgu)), which offers a variety of ways to convert the Beta Code of the original files into Unicode text files.
@@ -10,9 +14,38 @@ Install from PyPI with:
 pip install tlg-indices
 ```
 
-# Disclaimer
+# Practical use example
 
-This repository makes no claim to ownership of the contents of the original TLG CD-ROM, which are owned by the University of California, Irvine. It is an independent effort to facilitate study of texts and does not represent or imply endorsement by the University of California, Irvine or the TLG project.
+See also `practical_use_example.py`.
+
+```python
+from tlg_indices.tlgu import tlgu_convert_corpus
+from tlg_indices.file_utils import assemble_tlg_works_filepaths
+
+# Convert entire TLG corpus into author files
+conveted_tlg_dir: str = "~/Downloads/tlg-works"
+tlgu_convert_corpus(
+    orig_txt_dir="~/tlg/TLG_E",
+    target_txt_dir=conveted_tlg_dir,
+    corpus="tlg",
+    grouping="work",
+    overwrite=False,
+)
+
+# Get filepaths of converted TLG works
+tlg_works_filepaths: list[str] = assemble_tlg_works_filepaths(
+    corpus_dir=conveted_tlg_dir
+)
+# print("TLG works filepaths:", tlg_works_filepaths)
+
+# Open files
+for filepath in tlg_works_filepaths:
+    print(f"Processing: {filepath}")
+    with open(filepath, "r") as file:
+        content = file.read()
+        print(f"Content of {filepath}: {content[:100]}")  # Print first 100 characters
+
+```
 
 # Usage overview
 
