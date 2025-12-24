@@ -16,3 +16,12 @@ packages = ["src/tlg_indices"]
 
 [project.urls]
 Repository = "https://github.com/cltk/tlg_indices"
+
+[tool.mypy]
+mypy_path = "src"
+explicit_package_bases = true
+
+[dependency-groups]
+dev = [
+    "mypy>=1.19.1",
+]

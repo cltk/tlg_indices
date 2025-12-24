@@ -25,6 +25,17 @@ The main entry point is the utility functions in `src/tlg_indices/utils.py`, whi
 
 For a runnable walkthrough, open `tlg_index_examples.py` and follow the patterns there.
 
+PHI5 index helpers live in `src/tlg_indices/phi5_index_utils.py`, with a runnable tour in `phi5_examples.py`. These cover:
+
+- Author id/name lookups and reverse lookups for PHI5.
+- Author-to-work id mappings for PHI5.
+- Resolving author ids from work ids.
+
+File access utilities live in `src/tlg_indices/file_utils.py`. Use `file_access_examples.py` for runnable examples of:
+
+- `assemble_tlg_author_filepaths()` and `assemble_tlg_works_filepaths()`.
+- `assemble_phi5_author_filepaths()` and `assemble_phi5_works_filepaths()`.
+
 # Converting Beta Code with `tlgu`
 
 If you have Beta Code files from the original TLG/PHI distributions, you can convert them using the `tlgu` wrapper in this package. See `tlgu_examples.py` for runnable examples of:
@@ -35,7 +46,14 @@ If you have Beta Code files from the original TLG/PHI distributions, you can con
 
 Open `tlgu_examples.py` and adjust the file paths for your local setup.
 
-# Packaging
+
+# Development
+
+## Type checking
+
+`% uv run mypy *.py src/`
+
+## Packaging
 
 ```bash
 % uv build --no-sources

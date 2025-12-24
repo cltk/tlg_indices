@@ -163,10 +163,6 @@ def main() -> None:
     )
     print("Special date range (Incertum):", get_dates_in_range(special_range))
 
-    # Text loading
-    tlg_filepaths = assemble_tlg_author_filepaths(corpus_dir="~/Downloads/tlg-authors/")
-    print("TLG filepaths:", tlg_filepaths)
-
 
 if __name__ == "__main__":
     main()
